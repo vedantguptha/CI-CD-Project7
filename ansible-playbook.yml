@@ -1,57 +1,120 @@
+---
 - name: Play1 for copying files
-  hosts: docker-master
+  hosts: dockerMaster
   become: yes
   tasks:
     - name: Create a directory if it does not exist
       file:
         path: /tmp/{{ job_name }}
         state: directory
-        mode: "0755"
+        mode: '0755'
         owner: ansadmin
         group: root
       tags:
-        - create-dir
+         - create-dir
 
-- name: Play 2 - Python Install library
-  hosts: docker-master
+    - name: Copy the war file, dockerfile & lwplabs-com.yml to docker master server
+      copy:
+        src: "{{ ANSIBLE_WORKSPACE }}/"
+        dest: /tmp/{{ job_name }}
+        owner: ansadmin
+        group: root
+        mode: '0777'
+      tags:
+        - copy_code
+
+- name: "Play 2- python installation"
+  hosts: dockerMaster
   become: yes
   tasks:
     - name: Install Python 3.6
       yum:
         name: python36
         state: present
-      tags: python-install
+      register: out1
+      tags:
+        - python-install
+    - debug:
+        var: out1
 
     - name: alternatives
       alternatives:
         name: python
         link: /usr/bin/python3.6
         path: /usr/bin/python3
-      tags: python-alternatives
+      register: out2
+      tags:
+        - python-alternatives
+    - debug:
+        var: out2
 
-- name: Play 3 - Python library install and copying of War file
-  hosts: docker-master
+- name: "Play 3 Install Python packages and docker image push"
+  hosts: dockerMaster
   become: yes
   vars:
-    ansible_python_interpreter: /usr/bin/python
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
     - name: Install boto3 and botocore with pip3 module
       pip:
-        name:
-          - boto
-          - boto3
-          - botocore
-        executable: pip3.6
-      tags: boto-lib-install
+       name:
+        - boto
+        - boto3
+        - botocore
+        - docker
+          #- docker-py
+        - jsondiff
+        - pyyaml
+       executable: pip3.6
+      register: out3
+      tags: docker-lib-install
+    - debug:
+        var: out3
 
-- name: Play 4 Copy the  War file form S3 bucket
-  hosts: docker-master
+    - name: "Delete the docker image"
+      docker_image:
+        state: absent
+        force: yes
+        name: 127.0.0.1:5000/lwplabslogin
+        tag: latest
+      register: out4
+      tags: docker-image-deletion
+    - debug:
+        var: out4
+
+    - name: "Build an image and push it to a private repo"
+      docker_image:
+        build:
+          path: /tmp/{{ job_name }}
+        name: 127.0.0.1:5000/lwplabslogin
+        tag: "latest"
+        push: yes
+        nocache: yes
+        force: yes
+      register: out5
+      tags: docker-image-build
+    - debug:
+        var: out5
+
+- name: "Play 3 docker stack deploy"
+  hosts: dockerMaster
   become: yes
   tasks:
-    - name: copy the war file
-      aws_s3:
-        bucket: lwplabs-artifacts-webapp
-        object: LoginRegisterApp.war
-        dest: /tmp/{{ job_name }}
-        mode: get
-      tags: copy-war
+    - name: Remove stack
+      docker_stack:
+        name: "{{ job_name }}"
+        state: absent
+      tags: docker-stack-remove
+
+    - name: sleep for 10 sec
+      shell: sleep 10
+
+    - name: Deploy stack from a compose file
+      docker_stack:
+        state: present
+        name: "{{ job_name }}"
+        compose:
+          - /tmp/{{ job_name }}/docker-stack.yml
+      register: out6
+      tags: docker-stack-deploy
+    - debug:
+        var: out6
