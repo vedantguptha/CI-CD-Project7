@@ -1,4 +1,18 @@
-- name: Play 1 - Python Install library
+- name: Play1 for copying files
+  hosts: dockerMaster
+  become: yes
+  tasks:
+    - name: Create a directory if it does not exist
+      file:
+        path: /tmp/{{ job_name }}
+        state: directory
+        mode: '0755'
+        owner: ansadmin
+        group: root
+      tags:
+         - create-dir
+
+- name: Play 2 - Python Install library
   hosts: docker-master
   become: yes
   tasks:
@@ -15,7 +29,7 @@
         path: /usr/bin/python3
       tags: python-alternatives
 
-- name: Play 2 - Python library install and copying of War file
+- name: Play 3 - Python library install and copying of War file
   hosts: docker-master
   become: yes
   vars:
