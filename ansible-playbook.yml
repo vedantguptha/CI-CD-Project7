@@ -4,7 +4,7 @@
   tasks:
     - name: Create a directory if it does not exist
       file:
-        path: /tmp/{{ job_name }}
+        path: /tmp/project
         state: directory
         mode: '0755'
         owner: ansadmin
@@ -48,6 +48,6 @@
       aws_s3:
         bucket: lwplabs-artifacts-webapp
         object: LoginRegisterApp.war
-        dest: /tmp/{{ job_name }}
+        dest: /tmp/project
         mode: get
       tags: copy-war
