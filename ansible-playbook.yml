@@ -48,7 +48,7 @@
     - debug:
         var: out2
 
-- name: "Play 3 Install Python packages and docker image push"
+- name: "Play 3 Install Python packages"
   hosts: dockerMaster
   become: yes
   vars:
@@ -70,51 +70,19 @@
     - debug:
         var: out3
 
-    - name: "Delete the docker image"
-      docker_image:
-        state: absent
-        force: yes
-        name: 127.0.0.1:5000/lwplabslogin
-        tag: latest
-      register: out4
-      tags: docker-image-deletion
-    - debug:
-        var: out4
-
-    - name: "Build an image and push it to a private repo"
+- name: Build Docker image
+  hosts: dockerMaster
+  become: yes
+  tasks:
+    - name: Build Docker image
       docker_image:
         build:
           path: /tmp/{{ job_name }}
         name: 127.0.0.1:5000/lwplabslogin
-        tag: "latest"
-        push: yes
-        nocache: yes
+        tag: latest
+        state: build
         force: yes
       register: out5
       tags: docker-image-build
     - debug:
         var: out5
-
-- name: "Play 3 docker stack deploy"
-  hosts: dockerMaster
-  become: yes
-  tasks:
-    - name: Remove stack
-      docker_stack:
-        name: "{{ job_name }}"
-        state: absent
-      tags: docker-stack-remove
-
-    - name: sleep for 10 sec
-      shell: sleep 10
-
-    - name: Deploy stack from a compose file
-      docker_stack:
-        state: present
-        name: "{{ job_name }}"
-        compose:
-          - /tmp/{{ job_name }}/docker-stack.yml
-      register: out6
-      tags: docker-stack-deploy
-    - debug:
-        var: out6
