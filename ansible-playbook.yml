@@ -69,13 +69,28 @@
       tags: docker-lib-install
     - debug:
         var: out3
-    - name: "Delete the docker image"
+
+    - name: "Build an image and push it to a private repo"
       docker_image:
-        state: absent
+        build:
+          path: /tmp/{{ job_name }}
+        name: localhost:5000/lwplabslogin
+        tag: "latest"
+        push: yes
+        nocache: yes
         force: yes
-        name: 127.0.0.1:5000/lwplabslogin
-        tag: latest
-      register: out4
-      tags: docker-image-deletion
+      register: out5
+      tags: docker-image-build
     - debug:
-        var: out4
+        var: out5
+
+    # - name: "Delete the docker image"
+    #   docker_image:
+    #     state: absent
+    #     force: yes
+    #     name: 127.0.0.1:5000/lwplabslogin
+    #     tag: latest
+    #   register: out4
+    #   tags: docker-image-deletion
+    # - debug:
+    #     var: out4
