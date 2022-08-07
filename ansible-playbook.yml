@@ -6,11 +6,11 @@
       file:
         path: /tmp/{{ job_name }}
         state: directory
-        mode: '0755'
+        mode: "0755"
         owner: ansadmin
         group: root
       tags:
-         - create-dir
+        - create-dir
 
 - name: Play 2 - Python Install library
   hosts: docker-master
@@ -44,10 +44,14 @@
         executable: pip3.6
       tags: boto-lib-install
 
+- name: Play 4 Copy the  War file form S3 bucket
+  hosts: docker-master
+  become: yes
+  tasks:
     - name: copy the war file
       aws_s3:
         bucket: lwplabs-artifacts-webapp
         object: LoginRegisterApp.war
-        dest: /tmp/{{ job_name }}/
+        dest: /tmp/{{ job_name }}
         mode: get
       tags: copy-war
