@@ -48,6 +48,6 @@
       aws_s3:
         bucket: lwplabs-artifacts-webapp
         object: LoginRegisterApp.war
-        dest: /tmp/
+        dest: /tmp
         mode: get
       tags: copy-war
