@@ -1,10 +1,10 @@
 - name: Play1 for copying files
-  hosts: dockerMaster
+  hosts: docker-master
   become: yes
   tasks:
     - name: Create a directory if it does not exist
       file:
-        path: /tmp/project
+        path: /tmp/{{ job_name }}
         state: directory
         mode: '0755'
         owner: ansadmin
@@ -48,6 +48,6 @@
       aws_s3:
         bucket: lwplabs-artifacts-webapp
         object: LoginRegisterApp.war
-        dest: /tmp/project
+        dest: /tmp/{{ job_name }}
         mode: get
       tags: copy-war
