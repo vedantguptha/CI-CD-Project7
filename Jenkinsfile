@@ -7,7 +7,7 @@ pipeline {
               APP_NAME = "loginregisterapp"
               DOCKER_USER = "vedantdevops"
               MAJOR_VERSION = "1.0"
-              IMAGE_TAG = ${MAJOR_VERSION}.${BUILD_NUMBER}
+              IMAGE_TAG = "${MAJOR_VERSION}.${BUILD_NUMBER}"
     }
     stages {
         stage('Clean') {
