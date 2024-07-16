@@ -65,8 +65,8 @@ pipeline {
                     echo "Assume the Deploy feature/alpha is Success"
                   
                     timeout(time: 5, unit: 'MINUTES') {
-                        env.userChoice = input message: "Do you want to Deploy ${NEW_BUILD_DOCKER_IMAGE} ?",
-                            parameters: [choice(name: 'Versioning Service', choices: 'no\nyes', description: 'Choose "yes" if you want to deploy this build')]
+                        env.userChoice = input message: "Do you want to Deploy ${NEW_BUILD_DOCKER_IMAGE} of Application ? ",
+                            parameters: [choice(name: 'New Deploymnet Conformation', choices: 'no\nyes', description: 'Choose "yes" if you want to deploy this build')]
                     }
                     if (userChoice == 'yes') {
                 
