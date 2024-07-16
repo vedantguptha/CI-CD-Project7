@@ -42,9 +42,14 @@ pipeline {
                 }
             }  
         }
-         stage ('Push Docker Image') {
+        stage ('Push Docker Image') {
             steps {
                 sh ''' docker push vedantdevops/loginregisterapp:$BUILD_NUMBER ''' 
+            }  
+        }
+        stage ('Git Checkout') {
+            steps {
+                build job: 'merge', parameters: [string(name: 'release_version', value:  String.valueOf(BUILD_NUMBER)  )]
             }  
         }
     }
