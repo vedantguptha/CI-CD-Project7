@@ -3,6 +3,12 @@ pipeline {
     tools {
         maven "maven"
     }
+    environment {
+              APP_NAME = "loginregisterapp"
+              DOCKER_USER = "vedantdevops"
+              MAJOR_VERSION = "1.0"
+              IMAGE_TAG = ${MAJOR_VERSION}.${BUILD_NUMBER}
+    }
     stages {
         stage('Clean') {
             steps {
@@ -26,7 +32,7 @@ pipeline {
         }
         stage ('Artifactory') {
             steps {
-                sh 'aws s3 cp $WORKSPACE/target/*.war s3://b90-artifactory/LoginRegisterApp-$BUILD_NUMBER.war'
+                sh " aws s3 cp $WORKSPACE/target/*.war s3://b90-artifactory/${APP_NAME}-${IMAGE_TAG}.war "
             }  
         }
         stage ('Build Docker Iamge') {
