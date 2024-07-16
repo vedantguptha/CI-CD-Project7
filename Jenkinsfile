@@ -56,11 +56,25 @@ pipeline {
         }
         stage ('Git Checkout') {
             steps {
-                build job: 'merge', parameters: 
-                [
-                string(name: 'release_version_tag_id', value: "${IMAGE_TAG}"), 
-                string(name: 'docker_image_name', value: "${APP_NAME}")
-                ]
+                 script {
+                    echo "Assume the Deploy feature/alpha is Success"
+                  
+                    timeout(time: 5, unit: 'MINUTES') {
+                        env.userChoice = input message: "Do you want to Deploy ${NEW_BUILD_DOCKER_IMAGE} ?",
+                            parameters: [choice(name: 'Versioning Service', choices: 'no\nyes', description: 'Choose "yes" if you want to deploy this build')]
+                    }
+                    if (userChoice == 'yes') {
+                
+                        build job: 'merge', parameters: 
+                        [  string(name: 'release_version_tag_id', value: "${IMAGE_TAG}"),  string(name: 'docker_image_name', value: "${APP_NAME}") ]
+                    }
+                    else if(userChoice == 'no') {
+                        echo "Process abort by: ${user}"
+                    }
+                        
+                }
+
+
             }  
         }
     }
