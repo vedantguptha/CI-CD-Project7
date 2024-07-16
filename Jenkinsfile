@@ -21,9 +21,14 @@ pipeline {
                 git 'https://github.com/vedantguptha/CI-CD-Project7.git'
             }
         }
-        stage('Integration Test') {
+        stage('Unit Test maven') {
             steps {
                 sh 'mvn test'
+            }
+        }       
+        stage('Integration Test maven') {
+            steps {
+                sh 'mvn verify -DskipUnitTests'
             }
         }
         stage ('Package') {
