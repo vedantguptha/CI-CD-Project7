@@ -29,5 +29,11 @@ pipeline {
                 sh 'aws s3 cp $WORKSPACE/target/*.war s3://b90-artifactory/LoginRegisterApp-$BUILD_NUMBER.war'
             }  
         }
+        stage ('Build Docker Iamge') {
+            steps {
+                sh ''' cd $WORKSPACE ''' 
+                sh ''' docker build -t vedantdevops/loginregisterapp:$BUILD_NUMBER . ''' 
+            }  
+        }
     }
 }
