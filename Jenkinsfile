@@ -56,7 +56,11 @@ pipeline {
         }
         stage ('Git Checkout') {
             steps {
-                build job: 'merge', parameters: [string(name: 'release_version', value:  String.valueOf(BUILD_NUMBER)  )]
+                build job: 'merge', parameters: 
+                [
+                string(name: 'release_version_tag_id', value: "${IMAGE_TAG}"), 
+                string(name: 'docker_image_name', value: "${APP_NAME}")
+                ]
             }  
         }
     }
