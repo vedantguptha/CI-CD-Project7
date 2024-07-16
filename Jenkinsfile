@@ -8,6 +8,7 @@ pipeline {
               DOCKER_USER = "vedantdevops"
               MAJOR_VERSION = "1.0"
               IMAGE_TAG = "${MAJOR_VERSION}.${BUILD_NUMBER}"
+              NEW_DOCKER_IMAGE = "${DOCKER_USER}" + "/" + "${APP_NAME}:${IMAGE_TAG}" 
     }
     stages {
         stage('Clean') {
@@ -38,7 +39,7 @@ pipeline {
         stage ('Build Docker Iamge') {
             steps {
                 sh ''' cd $WORKSPACE ''' 
-                sh ''' docker build -t vedantdevops/loginregisterapp:$BUILD_NUMBER . ''' 
+                sh " docker build -t ${NEW_DOCKER_IMAGE} . "
             }  
         }
         stage ('Registery Login') {
