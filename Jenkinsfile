@@ -16,12 +16,17 @@ pipeline {
         }
         stage('Integration Test') {
             steps {
-                 sh 'mvn test'
+                sh 'mvn test'
             }
         }
         stage ('Package') {
             steps {
-                    sh 'mvn package'
+                sh 'mvn package'
+            }  
+        }
+        stage ('Artifactory') {
+            steps {
+                sh 'aws s3 cp $WORKSPACE/target/*.war s3://b90-artifactory/LoginRegisterApp-$BUILD_NUMBER.war'
             }  
         }
     }
